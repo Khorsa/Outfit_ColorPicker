@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:v="clr-namespace:System;assembly=mscorlib">
+    <v:String x:Key="ColorPickerTitle">ColorTools</v:String>
+    <v:String x:Key="ColorSelector">ColorSelector</v:String>
+    <v:String x:Key="ColorPicker">ColorPicker</v:String>
+    <v:String x:Key="Color">Color</v:String>
+
+</ResourceDictionary>

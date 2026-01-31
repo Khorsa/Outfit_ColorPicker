@@ -1,0 +1,229 @@
+﻿<Window x:Class="ColorPicker.ColorForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ColorPicker"
+        mc:Ignorable="d"
+        WindowStyle="ToolWindow" 
+        
+        Title="{DynamicResource ColorPickerTitle}" Height="385" Width="500" 
+        Activated="Window_Activated" 
+        SizeChanged="Window_SizeChanged">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ColorPicker;component/Languages/lang.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="CopyButtonStyle" TargetType="Button">
+                <Setter Property="Width" Value="20"/>
+                <Setter Property="Height" Value="18"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+            </Style>
+            <local:HalfConverter x:Key="HalfConverter"/>
+
+        </ResourceDictionary>
+    </Window.Resources>
+
+
+    <Grid>
+        <TabControl x:Name="colorSelectorTabs" SelectionChanged="colorSelectorTabs_SelectionChanged">
+            <TabItem x:Name="colorSelectorTab" Header="{DynamicResource ColorSelector}">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="40"></ColumnDefinition>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Canvas x:Name="SquareImageCanvas" ClipToBounds="True" Grid.Column="0" Margin="0 0 0 0" MouseMove="SquareImage_MouseMove" Cursor="Cross" MouseDown="SquareImageCanvas_MouseDown" MouseUp="SquareImageCanvas_MouseUp">
+                        <Image x:Name="SquareImage" Stretch="UniformToFill" Margin="0" Width="{Binding ActualWidth, ElementName=SquareImageCanvas}" Height="{Binding ActualHeight, ElementName=SquareImageCanvas}" />
+                        <Ellipse x:Name="SquareMarker" Stroke="Black" Canvas.Left="25" Canvas.Top="25" Width="10" Height="10" />
+                    </Canvas>
+
+                    <Canvas x:Name="ColumnImageCanvas" Grid.Column="1" Width="40" Margin="0" MouseMove="ColumnImageCanvas_MouseMove" Cursor="Cross" MouseDown="ColumnImageCanvas_MouseDown" MouseUp="ColumnImageCanvas_MouseUp">
+                        <Image x:Name="ColumnImage" Stretch="UniformToFill" Width="20" Margin="10 0 0 0" Height="{Binding ActualHeight, ElementName=SquareImageCanvas}" />
+                        <Rectangle x:Name="ColumnMarker" Stroke="Black" Canvas.Left="0" Canvas.Top="25" Width="40" Height="1" />
+                    </Canvas>
+
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="100"></RowDefinition>
+                            <RowDefinition Height="180"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Row="0" Grid.ColumnSpan="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource Color}"></Label>
+                            <StackPanel x:Name="ColorView" Grid.Row="0" Grid.Column="1" Margin="2" Background="#FFB73A3A"/>
+                            <Label Grid.Row="0" Grid.Column="2"></Label>
+
+                            <Label Grid.Row="1" Grid.Column="0">RGB</Label>
+                            <TextBox x:Name="tbColorRGB" Padding="2" Grid.Row="1" Grid.Column="1" Margin="2" VerticalContentAlignment="Center" IsReadOnly="True">0, 0, 0</TextBox>
+                            <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource CopyButtonStyle}" Click="Copy_Click" x:Name="bColorRGBCopy">
+                                <Image Source="/ColorPicker;component/Resources/copy.png" />
+                            </Button>
+
+                            <Label Grid.Row="2" Grid.Column="0">HSV</Label>
+                            <TextBox x:Name="tbColorHSV" Padding="2" Grid.Row="2" Grid.Column="1" Margin="2" VerticalContentAlignment="Center" IsReadOnly="True">0°, 0%, 0%</TextBox>
+                            <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource CopyButtonStyle}" Click="Copy_Click" x:Name="bColorHSVCopy">
+                                <Image Source="/ColorPicker;component/Resources/copy.png" />
+                            </Button>
+
+                            <Label Grid.Row="3" Grid.Column="0">WEB #</Label>
+                            <TextBox x:Name="tbColorWeb" Padding="2" Grid.Row="3" Grid.Column="1" Margin="2" VerticalContentAlignment="Center">000000</TextBox>
+                            <Button Grid.Row="3" Grid.Column="2" Style="{StaticResource CopyButtonStyle}" Click="Copy_Click" x:Name="bColorWebCopy">
+                                <Image Source="/ColorPicker;component/Resources/copy.png" />
+                            </Button>
+                        </Grid>
+
+                        <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="1" Grid.Row="1" Margin="0 10 0 0">
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+
+                                <RadioButton x:Name="RedMode" GroupName="ColorMode" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Checked="ColorModeChanged" Unchecked="ColorModeChanged">R:</RadioButton>
+                                <TextBox x:Name="tbR" Padding="2 0 2 0" Grid.Row="0" Grid.Column="1" Margin="5 2 2 2" VerticalAlignment="Center" HorizontalContentAlignment="Right">252</TextBox>
+                                <Label Grid.Row="0" Grid.Column="2"></Label>
+
+                                <RadioButton x:Name="GreenMode" GroupName="ColorMode" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Checked="ColorModeChanged" Unchecked="ColorModeChanged">G:</RadioButton>
+                                <TextBox x:Name="tbG" Padding="2 0 2 0" Grid.Row="1" Grid.Column="1" Margin="5 2 2 2" VerticalAlignment="Center" HorizontalContentAlignment="Right">252</TextBox>
+                                <Label Grid.Row="1" Grid.Column="2"></Label>
+
+                                <RadioButton x:Name="BlueMode" GroupName="ColorMode" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Checked="ColorModeChanged" Unchecked="ColorModeChanged">B:</RadioButton>
+                                <TextBox x:Name="tbB" Padding="2 0 2 0" Grid.Row="2" Grid.Column="1" Margin="5 2 2 2" VerticalAlignment="Center" HorizontalContentAlignment="Right">252</TextBox>
+                                <Label Grid.Row="2" Grid.Column="2"></Label>
+
+                                <RadioButton x:Name="HueMode" GroupName="ColorMode" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Checked="ColorModeChanged" Unchecked="ColorModeChanged">H:</RadioButton>
+                                <TextBox x:Name="tbH" Padding="2 0 2 0" Grid.Row="3" Grid.Column="1" Margin="5 2 2 2" VerticalAlignment="Center" HorizontalContentAlignment="Right">0</TextBox>
+                                <Label Grid.Row="3" Grid.Column="2">°</Label>
+
+                                <RadioButton x:Name="SaturationMode" GroupName="ColorMode" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Checked="ColorModeChanged" Unchecked="ColorModeChanged">S:</RadioButton>
+                                <TextBox x:Name="tbS" Padding="2 0 2 0" Grid.Row="4" Grid.Column="1" Margin="5 2 2 2" VerticalAlignment="Center" HorizontalContentAlignment="Right">0</TextBox>
+                                <Label Grid.Row="4" Grid.Column="2">%</Label>
+
+                                <RadioButton x:Name="ValueMode" GroupName="ColorMode" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Checked="ColorModeChanged" Unchecked="ColorModeChanged">V:</RadioButton>
+                                <TextBox x:Name="tbV" Padding="2 0 2 0" Grid.Row="5" Grid.Column="1" Margin="5 2 2 2" VerticalAlignment="Center" HorizontalContentAlignment="Right">99</TextBox>
+                                <Label Grid.Row="5" Grid.Column="2">%</Label>
+                            </Grid>
+                        </Border>
+                        <StackPanel Grid.Row="1" Grid.Column="1"></StackPanel>
+
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem x:Name="colorPickerTab" Header="{DynamicResource ColorPicker}">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Canvas x:Name="MagnifyImageCanvas" ClipToBounds="True" Grid.Column="0" Margin="0 0 0 0">
+                        <Image x:Name="MagnifyImage" Stretch="None" Margin="0" Width="{Binding ActualWidth, ElementName=MagnifyImageCanvas}" Height="{Binding ActualHeight, ElementName=MagnifyImageCanvas}" />
+                        <Ellipse x:Name="CenterDot" 
+                             Width="8" 
+                             Height="8" 
+                             Fill="Black" 
+                             Stroke="White" 
+                             StrokeThickness="1">
+                            <Ellipse.RenderTransform>
+                                <TranslateTransform 
+                                    X="{Binding ActualWidth, ElementName=MagnifyImageCanvas, Converter={StaticResource HalfConverter}}"
+                                    Y="{Binding ActualHeight, ElementName=MagnifyImageCanvas, Converter={StaticResource HalfConverter}}"/>
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+                    </Canvas>
+
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="10"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource Color}"></Label>
+                        <StackPanel x:Name="magnColorView" Grid.Row="0" Grid.Column="1" Margin="2" Background="#FFB73A3A"/>
+                        <Label Grid.Row="0" Grid.Column="2"></Label>
+
+                        <Label Grid.Row="1" Grid.Column="0">RGB</Label>
+                        <TextBox x:Name="tbMagnColorRGB" Padding="2" Grid.Row="1" Grid.Column="1" Margin="2" VerticalContentAlignment="Center" IsReadOnly="True">0, 0, 0</TextBox>
+                        <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource CopyButtonStyle}" Click="Copy_Click" x:Name="bMagnColorRGBCopy">
+                            <Image Source="/ColorPicker;component/Resources/copy.png" />
+                        </Button>
+
+                        <Label Grid.Row="2" Grid.Column="0">HSV</Label>
+                        <TextBox x:Name="tbMagnColorHSV" Padding="2" Grid.Row="2" Grid.Column="1" Margin="2" VerticalContentAlignment="Center" IsReadOnly="True">0°, 0%, 0%</TextBox>
+                        <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource CopyButtonStyle}" Click="Copy_Click" x:Name="bMagnColorHSVCopy">
+                            <Image Source="/ColorPicker;component/Resources/copy.png" />
+                        </Button>
+
+                        <Label Grid.Row="3" Grid.Column="0">WEB #</Label>
+                        <TextBox x:Name="tbMagnColorWeb" Padding="2" Grid.Row="3" Grid.Column="1" Margin="2" VerticalContentAlignment="Center" IsReadOnly="True">000000</TextBox>
+                        <Button Grid.Row="3" Grid.Column="2" Style="{StaticResource CopyButtonStyle}" Click="Copy_Click" x:Name="bMagnColorWebCopy">
+                            <Image Source="/ColorPicker;component/Resources/copy.png" />
+                        </Button>
+
+                        <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"></Label>
+
+
+                        <Label Grid.Row="5" Grid.Column="0">Масштаб</Label>
+                        <TextBox x:Name="tbMagnZoom" Padding="2" Grid.Row="5" Grid.Column="1" Margin="2" VerticalContentAlignment="Center" IsReadOnly="True">100 %</TextBox>
+                        <Button Grid.Row="5" Grid.Column="2" Style="{StaticResource CopyButtonStyle}" Click="ResetZoom_Click" x:Name="bMagnColorZoom">
+                            <Image Source="/ColorPicker;component/Resources/zoom_1_1.png" />
+                        </Button>
+
+                        <Label Grid.Row="6" Grid.Column="0">Позиция</Label>
+                        <TextBox x:Name="tbMagnPosition" Padding="2" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Margin="2" VerticalContentAlignment="Center" IsReadOnly="True">0, 0</TextBox>
+
+                        <StackPanel Grid.Row="7"></StackPanel>
+
+                    </Grid>
+
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

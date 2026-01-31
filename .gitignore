@@ -1,0 +1,4 @@
+obj/
+bin/
+copy.bat
+afterbuild.bat

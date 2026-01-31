@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\copy.png" />
+    <None Remove="Resources\cross_rl.cur" />
+    <None Remove="Resources\monitor_brush.png" />
+    <None Remove="Resources\palette2.png" />
+    <None Remove="Resources\zoom_1_1.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\API\v1\API1.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\copy.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\cross_rl.cur">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\monitor_brush.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\palette2.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\zoom_1_1.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="call afterbuild.bat" />
+  </Target>
+
+</Project>

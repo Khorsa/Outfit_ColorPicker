@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2026 Roman Stolyarov <rshome@mail.ru>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -104,6 +104,8 @@ public partial class ColorForm
             UnhookWindowsHookEx(_hookId);
             _hookId = IntPtr.Zero;
         }
+
+        _hooked = false;
     
         ReleaseGlobalMouse();
         _overlayWindow?.Close();
@@ -167,11 +169,19 @@ public partial class ColorForm
             System.Windows.Point screenPosition = Mouse.GetPosition(null);
             tbMagnPosition.Text = $"{screenPosition.X}, {screenPosition.Y}";
 
-            MagnifyImage.Source = _zoomImage.CapturePartOfScreen(
-                new System.Drawing.Point((int)screenPosition.X, (int)screenPosition.Y),
-                new System.Drawing.Size((int)MagnifyImageCanvas.ActualWidth, (int)MagnifyImageCanvas.ActualHeight),
-                Zoom
-            );
+            try
+            {
+                MagnifyImage.Source = _zoomImage.CapturePartOfScreen(
+                    new System.Drawing.Point((int)screenPosition.X, (int)screenPosition.Y),
+                    new System.Drawing.Size((int)MagnifyImageCanvas.ActualWidth, (int)MagnifyImageCanvas.ActualHeight),
+                    Zoom
+                );
+            }
+            catch
+            {
+                // Край экрана/смена монитора: кадр может быть вне виртуального экрана.
+                MagnifyImage.Source = null;
+            }
         }
     }
 

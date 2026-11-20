@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2026 Roman Stolyarov <rshome@mail.ru>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@ namespace ColorPicker;
 
 internal class ModuleController : IModuleController
 {
-    public static ColorForm ColorForm = new();
+    public static ColorForm? ColorForm;
 
     public List<ICommand> GetCommandList()
     {
@@ -54,11 +54,16 @@ internal class ModuleController : IModuleController
 
     public void Shutdown()
     {
-        ColorForm.Close();
+        if (ColorForm != null)
+        {
+            ColorForm.Close();
+            ColorForm = null;
+        }
     }
 
     public void Init(ILogger logger)
     {
+        ColorForm?.Close();
         ColorForm = new ColorForm();
     }
 }

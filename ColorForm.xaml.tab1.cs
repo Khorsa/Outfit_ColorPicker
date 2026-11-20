@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2026 Roman Stolyarov <rshome@mail.ru>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -214,94 +214,146 @@ public partial class ColorForm
     {
         RemoveEventFromTextBoxes();
 
-        if (nowChangingBox != null)
+        try
         {
-            EColor color = new(0, 0, 0, 0);
-            // Изменяется одно из полей
-            if (nowChangingBox == tbColorWeb)
-            {
-                string colorHex = Regex.Replace((tbColorWeb.Text + "000000").Substring(0, 6), @"[^0-9A-Fa-f]", "0");
-                color = new EColor(255, Convert.ToInt32(colorHex.Substring(0, 2), 16), Convert.ToInt32(colorHex.Substring(2, 2), 16), Convert.ToInt32(colorHex.Substring(4, 2), 16));
-            }
+            var color = ReadColor(nowChangingBox);
 
-            if (nowChangingBox != tbR) tbR.Text = color.R.ToString();
-            if (nowChangingBox != tbG) tbG.Text = color.G.ToString();
-            if (nowChangingBox != tbB) tbB.Text = color.B.ToString();
-            if (nowChangingBox != tbH) tbH.Text = ((int)color.H).ToString();
-            if (nowChangingBox != tbS) tbS.Text = ((int)color.S).ToString();
-            if (nowChangingBox != tbV) tbV.Text = ((int)color.V).ToString();
-            if (nowChangingBox != tbColorRGB) tbColorRGB.Text = color.R.ToString() + ", " + color.G.ToString() + ", " + color.B.ToString();
-            if (nowChangingBox != tbColorHSV) tbColorHSV.Text = color.H.ToString("0°") + ", " + color.S.ToString("0") + "%, " + color.V.ToString("0") + "%";
-            if (nowChangingBox != tbColorWeb) tbColorWeb.Text = $"{color.R:X2}{color.G:X2}{color.B:X2}";
+            tbR.Text = color.R.ToString();
+            tbG.Text = color.G.ToString();
+            tbB.Text = color.B.ToString();
+            tbH.Text = ((int)Math.Round(color.H)).ToString();
+            tbS.Text = ((int)Math.Round(color.S)).ToString();
+            tbV.Text = ((int)Math.Round(color.V)).ToString();
+            tbColorRGB.Text = color.R + ", " + color.G + ", " + color.B;
+            tbColorHSV.Text = color.H.ToString("0°") + ", " + color.S.ToString("0") + "%, " + color.V.ToString("0") + "%";
+            tbColorWeb.Text = $"{color.R:X2}{color.G:X2}{color.B:X2}";
             ColorView.Background = new SolidColorBrush(color.Color);
 
-            var columnHeight = (int)ColumnImageCanvas.ActualHeight;
-            var squareWidth = SquareImageCanvas.ActualWidth;
-            var squareHeight = SquareImageCanvas.ActualHeight;
+            var columnHeight = Math.Max(1, (int)ColumnImageCanvas.ActualHeight);
+            var squareWidth = Math.Max(1, SquareImageCanvas.ActualWidth);
+            var squareHeight = Math.Max(1, SquareImageCanvas.ActualHeight);
 
-            if (_mode == ColorMode.Hue)
+            switch (_mode)
             {
-                _selectorPosition = columnHeight - int.Parse(tbH.Text) * columnHeight / 360;
-                _mainPosition.X = int.Parse(tbS.Text) * squareWidth / 100;
-                _mainPosition.Y = squareHeight - int.Parse(tbV.Text) * squareHeight / 100;
+                case ColorMode.Hue:
+                    _selectorPosition = columnHeight - (int)(color.H * columnHeight / 360);
+                    _mainPosition.X = color.S * squareWidth / 100;
+                    _mainPosition.Y = squareHeight - color.V * squareHeight / 100;
+                    break;
+                case ColorMode.Saturation:
+                    _selectorPosition = columnHeight - (int)(color.S * columnHeight / 100);
+                    _mainPosition.X = color.H * squareWidth / 360;
+                    _mainPosition.Y = squareHeight - color.V * squareHeight / 100;
+                    break;
+                case ColorMode.Value:
+                    _selectorPosition = columnHeight - (int)(color.V * columnHeight / 100);
+                    _mainPosition.X = color.H * squareWidth / 360;
+                    _mainPosition.Y = squareHeight - color.S * squareHeight / 100;
+                    break;
+                case ColorMode.Red:
+                    _selectorPosition = columnHeight - color.R * columnHeight / 256;
+                    _mainPosition.X = color.G * squareWidth / 256;
+                    _mainPosition.Y = squareHeight - color.B * squareHeight / 256;
+                    break;
+                case ColorMode.Green:
+                    _selectorPosition = columnHeight - color.G * columnHeight / 256;
+                    _mainPosition.X = color.R * squareWidth / 256;
+                    _mainPosition.Y = squareHeight - color.B * squareHeight / 256;
+                    break;
+                case ColorMode.Blue:
+                    _selectorPosition = columnHeight - color.B * columnHeight / 256;
+                    _mainPosition.X = color.R * squareWidth / 256;
+                    _mainPosition.Y = squareHeight - color.G * squareHeight / 256;
+                    break;
             }
-            if (_mode == ColorMode.Saturation)
-            {
-                _selectorPosition = columnHeight - int.Parse(tbS.Text) * columnHeight / 100;
-                _mainPosition.X = int.Parse(tbH.Text) * squareWidth / 360;
-                _mainPosition.Y = squareHeight - int.Parse(tbV.Text) * squareHeight / 100;
-            }
-            if (_mode == ColorMode.Value)
-            {
-                _selectorPosition = columnHeight - int.Parse(tbV.Text) * columnHeight / 100;
-                _mainPosition.X = int.Parse(tbH.Text) * squareWidth / 360;
-                _mainPosition.Y = squareHeight - int.Parse(tbS.Text) * squareHeight / 100;
-            }
-            if (_mode == ColorMode.Red)
-            {
-                _selectorPosition = columnHeight - int.Parse(tbR.Text) * columnHeight / 256;
-                _mainPosition.X = int.Parse(tbG.Text) * squareWidth / 256;
-                _mainPosition.Y = squareHeight - int.Parse(tbB.Text) * squareHeight / 256;
-            }
-            if (_mode == ColorMode.Green)
-            {
-                _selectorPosition = columnHeight - int.Parse(tbG.Text) * columnHeight / 256;
-                _mainPosition.X = int.Parse(tbR.Text) * squareWidth / 256;
-                _mainPosition.Y = squareHeight - int.Parse(tbB.Text) * squareHeight / 256;
-            }
-            if (_mode == ColorMode.Blue)
-            {
-                _selectorPosition = columnHeight - int.Parse(tbB.Text) * columnHeight / 256;
-                _mainPosition.X = int.Parse(tbR.Text) * squareWidth / 256;
-                _mainPosition.Y = squareHeight - int.Parse(tbG.Text) * squareHeight / 256;
-            }
+
+            _selectorPosition = Math.Clamp(_selectorPosition, 0, columnHeight - 1);
+            _mainPosition.X = Math.Clamp(_mainPosition.X, 0, Math.Max(0, squareWidth - 1));
+            _mainPosition.Y = Math.Clamp(_mainPosition.Y, 0, Math.Max(0, squareHeight - 1));
         }
-        else
+        finally
         {
-            ColorView.Background = new SolidColorBrush(BrightPointColor.Color);
+            AddEventToTextBoxes();
+        }
+    }
 
-            int r = BrightPointColor.R;
-            int g = BrightPointColor.G;
-            int b = BrightPointColor.B;
-            double h = BrightPointColor.H;
-            double s = BrightPointColor.S;
-            double v = BrightPointColor.V;
+    private EColor ReadColor(TextBox? nowChangingBox)
+    {
+        var current = BrightPointColor;
 
+        if (nowChangingBox == null) return current;
 
-            tbColorRGB.Text = r.ToString() + ", " + g.ToString() + ", " + b.ToString();
-            tbColorHSV.Text = h.ToString("0°") + ", " + s.ToString("0") + "%, " + v.ToString("0") + "%";
-            tbColorWeb.Text = $"{r:X2}{g:X2}{b:X2}";
-
-            tbR.Text = r.ToString();
-            tbG.Text = g.ToString();
-            tbB.Text = b.ToString();
-
-            tbH.Text = h.ToString("0");
-            tbS.Text = s.ToString("0");
-            tbV.Text = v.ToString("0");
+        if (nowChangingBox == tbColorWeb)
+        {
+            var colorHex = Regex.Replace((tbColorWeb.Text + "000000").Substring(0, 6), @"[^0-9A-Fa-f]", "0");
+            return new EColor(255,
+                Convert.ToInt32(colorHex.Substring(0, 2), 16),
+                Convert.ToInt32(colorHex.Substring(2, 2), 16),
+                Convert.ToInt32(colorHex.Substring(4, 2), 16));
         }
 
-        AddEventToTextBoxes();
+        if (nowChangingBox == tbColorRGB)
+        {
+            var parts = tbColorRGB.Text.Split(',')
+                .Select(part => part.Trim())
+                .ToArray();
+
+            if (parts.Length >= 3
+                && int.TryParse(parts[0], out var r)
+                && int.TryParse(parts[1], out var g)
+                && int.TryParse(parts[2], out var b))
+            {
+                return new EColor(255, Math.Clamp(r, 0, 255), Math.Clamp(g, 0, 255), Math.Clamp(b, 0, 255));
+            }
+
+            return current;
+        }
+
+        if (nowChangingBox == tbColorHSV)
+        {
+            var numbers = Regex.Matches(tbColorHSV.Text, @"\d+(?:[.,]\d+)?")
+                .Select(match => double.TryParse(match.Value.Replace(',', '.'), out var value) ? value : double.NaN)
+                .Where(value => !double.IsNaN(value))
+                .ToArray();
+
+            if (numbers.Length >= 3)
+            {
+                return new EColor(
+                    Math.Clamp(numbers[0], 0, 360),
+                    Math.Clamp(numbers[1], 0, 100),
+                    Math.Clamp(numbers[2], 0, 100));
+            }
+
+            return current;
+        }
+
+        if (_mode is ColorMode.Red or ColorMode.Green or ColorMode.Blue)
+        {
+            return new EColor(255,
+                Math.Clamp(ReadInt(tbR.Text, current.R), 0, 255),
+                Math.Clamp(ReadInt(tbG.Text, current.G), 0, 255),
+                Math.Clamp(ReadInt(tbB.Text, current.B), 0, 255));
+        }
+
+        return new EColor(
+            Math.Clamp(ReadDouble(tbH.Text, current.H), 0, 360),
+            Math.Clamp(ReadDouble(tbS.Text, current.S), 0, 100),
+            Math.Clamp(ReadDouble(tbV.Text, current.V), 0, 100));
+    }
+
+    private static int ReadInt(string text, int fallback)
+    {
+        return int.TryParse(text, out var value) ? value : fallback;
+    }
+
+    private static double ReadDouble(string text, double fallback)
+    {
+        return double.TryParse(text.Replace(',', '.'),
+            System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var value)
+            ? value
+            : fallback;
     }
 
 
